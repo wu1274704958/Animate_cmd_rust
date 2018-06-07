@@ -68,6 +68,7 @@ fn print(str: &[u8])
 
 struct Canvas {
     pub data: Vec<u8>,
+    pub zb : Vec<i8>,
     pub w: u32,
     pub h: u32,
 }
@@ -82,6 +83,7 @@ impl Canvas {
     pub fn new(width: u32, height: u32) -> Canvas {
         let mut c = Canvas {
             data: vec![b' '; ((width + 1) * height) as usize],
+            zb : vec![-128;(width * height) as usize],
             w: width,
             h: height,
         };
@@ -93,6 +95,7 @@ impl Canvas {
         for i in 0..self.h {
             self.data[(i * (self.w + 1) + self.w) as usize] = b'\n';
         }
+        self.zb.iter_mut().for_each(|it|{*it = -128});
     }
     pub fn setPixel(&mut self, x: u32, y: u32 ,z:i32)
     {
@@ -122,7 +125,11 @@ impl Canvas {
              10 => b'@',
             _ => b'#'
         };
-        self.data[(y * (self.w + 1) + x) as usize] = p;
+        if self.zb[(y * self.w + x) as usize] < (z as i8)
+        {
+            self.data[(y * (self.w + 1) + x) as usize] = p;
+            self.zb[(y * self.w + x) as usize] = z as i8;
+        }
     }
     pub fn inBound(&self, x: i32, y: i32) -> bool {
         x >= 0 && x < self.w as i32 && y >= 0 && y < self.h as i32
@@ -183,7 +190,7 @@ fn main() {
         str.init();
         //if angle >= std::f32::consts::PI {break;}
         gotoxy(0, 0);
-        let rot: Matrix4<f32> = Matrix4::from_axis_angle(Vector3::new(0.0f32, 1.0f32, 0.0f32), Rad(angle));
+        let rot: Matrix4<f32> = Matrix4::from_axis_angle(Vector3::new(0.0f32, 1.0f32, 0f32), Rad(angle));
         let tv1 = mat * translate * rot_x * rot * scale * v;
         let tv2 = mat * translate * rot_x * rot * scale * v2;
         let tv3 = mat * translate * rot_x * rot * scale * v3;
