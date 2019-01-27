@@ -4,7 +4,7 @@ use std::ffi::OsString;
 use std::time::Duration;
 use std::io::Error;
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 extern crate winapi;
 
 use std::iter::once;
@@ -27,7 +27,7 @@ use cgmath::{Vector4, ortho,perspective, Vector3, Rotation3, Rad, Matrix3, Basis
 use cgmath::Matrix4;
 use cgmath::Deg;
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 fn print_message(msg: &str) -> Result<i32, Error> {
     let wide: Vec<u16> = OsStr::new(msg).encode_wide().chain(once(0)).collect();
     let ret = unsafe {
@@ -39,7 +39,7 @@ fn print_message(msg: &str) -> Result<i32, Error> {
 //static CLS_CONTENT :Vec<u8> = Vec::new();
 static CLS_CONTENT: [u8; 1000] = [b' '; 1000];
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 fn cls()
 {
     let std_h = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) };
@@ -49,7 +49,7 @@ fn cls()
     unsafe { WriteConsoleA(std_h, CLS_CONTENT.as_ptr() as *const c_void, CLS_CONTENT.len() as u32, &mut s as *mut u32, NULL) };
 }
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 fn gotoxy(x: i16, y: i16)
 {
     let std_h = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) };
@@ -58,7 +58,7 @@ fn gotoxy(x: i16, y: i16)
     unsafe { SetConsoleCursorPosition(std_h, c) };
 }
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 fn print(str: &[u8])
 {
     let std_h = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) };
