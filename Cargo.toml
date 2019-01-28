@@ -5,7 +5,9 @@ authors = ["wws <1274704958@qq.com>"]
 edition = "2018"
 
 [dependencies]
-cgmath = "0.16.1"
+cgmath = "0.17"
+console = "0.7.5"
 
-[target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3", features = ["winuser","processenv","consoleapi","winbase","handleapi"] }
+
+[replace]
+"rand:0.6.5" = { git = 'https://github.com/rust-random/rand', branch = '0.5' }

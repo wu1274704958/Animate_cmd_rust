@@ -4,67 +4,18 @@ use std::ffi::OsString;
 use std::time::Duration;
 use std::io::Error;
 
-#[cfg(target_os = "windows")]
-extern crate winapi;
-
-use std::iter::once;
-use std::os::windows::ffi::OsStrExt;
-use std::ptr::null_mut;
-use winapi::um::winuser::{MB_OK, MessageBoxW};
-use winapi::um::processenv::GetStdHandle;
-use winapi::um::winbase::STD_OUTPUT_HANDLE;
-use winapi::um::wincon::{COORD, SetConsoleCursorPosition};
-use winapi::um::consoleapi::WriteConsoleA;
-use winapi::shared::ntdef::NULL;
-use winapi::ctypes::c_void;
-use std::vec::Vec;
-use std::io::Write;
-
 extern crate cgmath;
+extern crate console;
 
 use cgmath::prelude::*;
 use cgmath::{Vector4, ortho,perspective, Vector3, Rotation3, Rad, Matrix3, Basis3, Point3};
 use cgmath::Matrix4;
 use cgmath::Deg;
 
-#[cfg(target_os = "windows")]
-fn print_message(msg: &str) -> Result<i32, Error> {
-    let wide: Vec<u16> = OsStr::new(msg).encode_wide().chain(once(0)).collect();
-    let ret = unsafe {
-        MessageBoxW(null_mut(), wide.as_ptr(), wide.as_ptr(), MB_OK)
-    };
-    if ret == 0 { Err(Error::last_os_error()) } else { Ok(ret) }
-}
+use std::io::Write;
 
-//static CLS_CONTENT :Vec<u8> = Vec::new();
-static CLS_CONTENT: [u8; 1000] = [b' '; 1000];
+use console::{style,Term};
 
-#[cfg(target_os = "windows")]
-fn cls()
-{
-    let std_h = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) };
-    let c = COORD { X: 0, Y: 0 };
-    unsafe { SetConsoleCursorPosition(std_h, c) };
-    let mut s = 0u32;
-    unsafe { WriteConsoleA(std_h, CLS_CONTENT.as_ptr() as *const c_void, CLS_CONTENT.len() as u32, &mut s as *mut u32, NULL) };
-}
-
-#[cfg(target_os = "windows")]
-fn gotoxy(x: i16, y: i16)
-{
-    let std_h = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) };
-    let c = COORD { X: x, Y: y };
-
-    unsafe { SetConsoleCursorPosition(std_h, c) };
-}
-
-#[cfg(target_os = "windows")]
-fn print(str: &[u8])
-{
-    let std_h = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) };
-    let mut s = 0u32;
-    unsafe { WriteConsoleA(std_h, str.as_ptr() as *const c_void, str.len() as u32, &mut s as *mut u32, NULL) };
-}
 
 struct Canvas {
     pub data: Vec<u8>,
@@ -186,10 +137,12 @@ fn main() {
 
     let mut str = Canvas::new(80, 80);
 
+    let mut stdout = Term::stdout();
+
     for i in 1..=3100 {
         str.init();
         //if angle >= std::f32::consts::PI {break;}
-        gotoxy(0, 0);
+        stdout.move_cursor_up(80);
         let rot: Matrix4<f32> = Matrix4::from_axis_angle(Vector3::new(0.0f32, 1.0f32, 0f32), Rad(angle));
         let tv1 = mat * translate * rot_x * rot * scale * v;
         let tv2 = mat * translate * rot_x * rot * scale * v2;
@@ -209,7 +162,8 @@ fn main() {
         str.drawLine(&tv1, &tv5);
 
         angle += 0.1;
-        print(str.data.as_ref());
+        stdout.write(str.data.as_ref());
+        stdout.write_line("");
         sleep(Duration::from_millis(28));
     }
 }
