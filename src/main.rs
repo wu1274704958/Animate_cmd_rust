@@ -163,7 +163,6 @@ fn main() {
 
         angle += 0.1;
         stdout.write(str.data.as_ref());
-        stdout.write_line("");
         sleep(Duration::from_millis(28));
     }
 }

@@ -8,6 +8,5 @@ edition = "2018"
 cgmath = "0.17"
 console = "0.7.5"
 
-
-[replace]
-"rand:0.6.5" = { git = 'https://github.com/rust-random/rand', branch = '0.5' }
+[patch.crates-io]
+rand = { git = 'https://github.com/rust-random/rand', tag= '0.6.5' }
