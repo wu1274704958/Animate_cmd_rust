@@ -13,6 +13,7 @@ use cgmath::Matrix4;
 use cgmath::Deg;
 
 use std::io::Write;
+use std::str::from_utf8;
 
 use console::{style,Term};
 
@@ -162,7 +163,9 @@ fn main() {
         str.drawLine(&tv1, &tv5);
 
         angle += 0.1;
-        stdout.write(str.data.as_ref());
+//        stdout.write(str.data.as_ref());
+        let s = from_utf8( str.data.as_slice() ).unwrap();
+        print!("{}",style(s).cyan().on_black().bold());
         sleep(Duration::from_millis(28));
     }
 }
