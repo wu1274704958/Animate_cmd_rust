@@ -86,7 +86,7 @@ fn main() {
         angle += 0.1;
 //        stdout.write(str.data.as_ref());
         let s = from_utf8( str.data.as_slice() ).unwrap();
-        print!("{}",style(s).blue().on_black().bold());
+        print!("{}",style(s).cyan().on_black().bold());
         sleep(Duration::from_millis(28));
     }
 }
